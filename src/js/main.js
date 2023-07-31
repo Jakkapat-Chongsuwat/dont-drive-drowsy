@@ -51,13 +51,6 @@ function nextFrame() {
   let deltaTime = Date.now() - lastClosedTime;
   if (deltaTime > timeThreshold && continuous) {
     start_alarm();
-    if (!messageSent) { // Only send message if not already sent for current blink
-      console.log("Blink detected");
-      let messageData = { value1: "blinkMessage", value2: true, value3: blink ? 1 : 0 };
-      let jsonString = JSON.stringify(messageData);
-      makroIframe.contentWindow.postMessage(jsonString, iframeUrl);
-      messageSent = true; // Remember that a message has been sent
-    }
     body.style.background = "#f00";
   } else {
     stop_alarm();
@@ -71,6 +64,15 @@ function nextFrame() {
       expressions[8] >= eyesClosedThreshold && // For left and right eye
       expressions[9] >= eyesClosedThreshold
     ) {
+      if (!messageSent) { // Only send message if not already sent for current blink
+        blink = true;
+        console.log("Blink detected");
+        let messageData = { value1: "blinkMessage", value2: true, value3: blink ? 1 : 0 };
+        let jsonString = JSON.stringify(messageData);
+        makroIframe.contentWindow.postMessage(jsonString, iframeUrl);
+        messageSent = true; // Remember that a message has been sent
+      }
+  
       if (!continuous) lastClosedTime = Date.now();
       continuous = true;
       
